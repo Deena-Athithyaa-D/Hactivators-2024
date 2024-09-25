@@ -14,21 +14,15 @@ const Signup = () => {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    try {
-      await auth?.signup(name, email, password);
-      // After signup, navigate to chat page regardless of authentication state
-      navigate("/chat");
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   await auth?.signup(name, email, password);
+    //   // After signup, navigate to chat page regardless of authentication state
+    //   navigate("/chat");
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
-  useEffect(() => {
-    if (auth?.user) {
-      // Navigate to chat if user is authenticated
-      navigate("/chat");
-    }
-  }, [auth]);
 
   return (
     <>
@@ -93,7 +87,7 @@ const Signup = () => {
             >
               Name
             </Typography>
-            <CustomizedInput type="text" name="name" />
+            <CustomizedInput label="cs4" type="text" name="name" />
 
             {/* Email Label */}
             <Typography
@@ -106,7 +100,7 @@ const Signup = () => {
             >
               Email
             </Typography>
-            <CustomizedInput type="email" name="email" />
+            <CustomizedInput label="cs2" type="email" name="email" />
 
             {/* Password Label */}
             <Typography
@@ -119,7 +113,7 @@ const Signup = () => {
             >
               Password
             </Typography>
-            <CustomizedInput type="password" name="password" />
+            <CustomizedInput label="cs3" type="password" name="password" />
 
             <Button
               type="submit"

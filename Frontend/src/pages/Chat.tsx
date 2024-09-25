@@ -26,9 +26,9 @@ const theme = createTheme({
 });
 
 const Chat = () => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null); // Ref for the chat container
-  const [chatMessages, setChatMessages] = useState<[]>([]);
+  const [chatMessages, setChatMessages] = useState([]);
   const [prompt, setPrompt] = useState<string>("");
 
 
@@ -37,7 +37,7 @@ const Chat = () => {
     if (inputRef && inputRef.current) {
       inputRef.current.value = "";
     }
-    const newMessage: Message = { role: "user", content, type: "text" };
+    const newMessage = { role: "user", content, type: "text" };
     setChatMessages((prev) => [...prev, newMessage]);
     console.log("yoyo came inside handle submit")
     try{
@@ -74,7 +74,7 @@ const Chat = () => {
 
     // Show video message if input is "arjun"
     if (content.toLowerCase() === "arjun") {
-      const videoMessage: Message = {
+      const videoMessage = {
         role: "assistant",
         content:
           "https://myawsstestings3.s3.eu-north-1.amazonaws.com/Video+Files/1+h.mp4",
@@ -83,7 +83,7 @@ const Chat = () => {
       setChatMessages((prev) => [...prev, videoMessage]);
     } else {
       // Simulate a dummy response
-      // const dummyResponse: Message = {
+      // const dummyResponse = {
       //   role: "assistant",
       //   content: "response", // Dummy response
       //   type: "text",
@@ -110,7 +110,7 @@ const Chat = () => {
     const loadChats = async () => {
       toast.loading("Loading Chats", { id: "loadchats" });
       // Simulated chat messages
-      const initialMessages: Message[] = [
+      const initialMessages = [
         {
           role: "assistant",
           content: "Hello! How can I assist you?",
@@ -293,15 +293,6 @@ const Chat = () => {
                     content={chat.content}
                     role={chat.role}
                     key={index}
-                    sx={{
-                      backgroundColor:
-                        chat.role === "user" ? "primary.main" : "#5B27A0", // Violet theme for response
-                      borderRadius: 2,
-                      padding: "10px",
-                      margin: "10px 0",
-                      alignSelf:
-                        chat.role === "user" ? "flex-end" : "flex-start",
-                    }}
                   />
                 )
               )}
@@ -318,7 +309,7 @@ const Chat = () => {
               <textarea
                 ref={inputRef}
                 placeholder="Type a message"
-                onKeyDown={handleKeyDown}
+                // onKeyDown={handleKeyDown}
                 onChange={(e) => {setPrompt(e.target.value)}}
                 style={{
                   flex: 1,

@@ -25,7 +25,7 @@ const Home = () => {
 
   return (
     <ThemeProvider theme={customTheme}>
-      <Header sx={{ zIndex: 1000, position: 'relative' }} /> {/* Ensure the header has a high z-index */}
+      <Header /> {/* Ensure the header has a high z-index */}
       <Box
         width={"100%"}
         height={"100%"}

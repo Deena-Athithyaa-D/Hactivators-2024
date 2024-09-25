@@ -77,7 +77,7 @@ const Login = () => {
             >
               Email
             </Typography>
-            <CustomizedInput type="email" name="email" />
+            <CustomizedInput label="cs1" type="email" name="email" />
 
             {/* Password Label */}
             <Typography
@@ -90,7 +90,7 @@ const Login = () => {
             >
               Password
             </Typography>
-            <CustomizedInput type="password" name="password" />
+            <CustomizedInput label="cs7" type="password" name="password" />
 
             <Button
               type="submit"
