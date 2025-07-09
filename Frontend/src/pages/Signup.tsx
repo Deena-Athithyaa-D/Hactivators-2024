@@ -1,12 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { IoIosLogIn } from "react-icons/io";
-import { Box, Typography, Button } from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+
 import CustomizedInput from "../components/shared/CustomizedInput";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header.tsx";
+import axios from 'axios'; // Make sure to install axios
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -14,21 +20,29 @@ const Signup = () => {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    
     try {
-      await auth?.signup(name, email, password);
-      // After signup, navigate to chat page regardless of authentication state
-      navigate("/chat");
+      // Replace with your actual API endpoint
+      const response = await axios.post('http://your-api-endpoint/signup', {
+        name,
+        email,
+        password
+      });
+
+      // Handle successful signup
+      if (response.data.success) {
+        // Store user data in localStorage or session
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('token', response.data.token);
+        navigate("/chat");
+      } else {
+        setError(response.data.message || "Signup failed");
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Signup error:", error);
+      setError("An error occurred during signup");
     }
   };
-
-  useEffect(() => {
-    if (auth?.user) {
-      // Navigate to chat if user is authenticated
-      navigate("/chat");
-    }
-  }, [auth]);
 
   return (
     <>
@@ -37,9 +51,9 @@ const Signup = () => {
         {/* Left Image */}
         <Box
           padding={2}
-          display={{ md: "flex", sm: "none", xs: "none" }} // Show image on larger screens
+          display={{ md: "flex", sm: "none", xs: "none" }}
           alignItems="center"
-          sx={{ marginLeft: "15%" }} // Shift image 15% to the right
+          sx={{ marginLeft: "15%" }}
         >
           <img src="airobot.png" alt="Robot" style={{ width: "400px" }} />
         </Box>
@@ -47,11 +61,11 @@ const Signup = () => {
         {/* Right Side for Form */}
         <Box
           display="flex"
-          justifyContent="flex-end" // Align children to the right
-          alignItems="flex-start" // Align to the top
-          padding={2} // Add some padding for aesthetics
-          flex={1} // Take the remaining space
-          sx={{ marginRight: "10%" }} // Shift form 10% to the left
+          justifyContent="flex-end"
+          alignItems="flex-start"
+          padding={2}
+          flex={1}
+          sx={{ marginRight: "10%" }}
         >
           <Box
             component="form"
@@ -60,17 +74,17 @@ const Signup = () => {
               padding: "30px",
               boxShadow: "10px 10px 20px #000",
               borderRadius: "10px",
-              border: "3px solid transparent", // Set initial border to transparent
-              borderColor: "violet", // Set border color
-              animation: "fadeInBorder 1s ease-in-out", // Apply animation
-              '@keyframes fadeInBorder': { // Define the fade-in animation
+              border: "3px solid transparent",
+              borderColor: "violet",
+              animation: "fadeInBorder 1s ease-in-out",
+              '@keyframes fadeInBorder': {
                 '0%': { borderColor: 'transparent' },
                 '100%': { borderColor: 'violet' },
               },
-              width: '100%', // Full width for responsiveness
-              maxWidth: '400px', // Set a max width for the form
-              display: 'flex', // Set to flex to manage alignment easily
-              flexDirection: 'column', // Arrange children vertically
+              width: '100%',
+              maxWidth: '400px',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             {/* Signup Title */}
@@ -83,7 +97,13 @@ const Signup = () => {
               Signup
             </Typography>
 
-            {/* Name Label */}
+            {error && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {error}
+              </Typography>
+            )}
+
+            {/* Name Input */}
             <Typography
               sx={{ 
                 marginBottom: "8px", 
@@ -93,9 +113,9 @@ const Signup = () => {
             >
               Name
             </Typography>
-            <CustomizedInput type="text" name="name" />
+            <CustomizedInput type="text" name="name" label="Name" />
 
-            {/* Email Label */}
+            {/* Email Input */}
             <Typography
               sx={{ 
                 marginTop: "16px", 
@@ -106,9 +126,9 @@ const Signup = () => {
             >
               Email
             </Typography>
-            <CustomizedInput type="email" name="email" />
+            <CustomizedInput type="email" name="email" label="Email" />
 
-            {/* Password Label */}
+            {/* Password Input */}
             <Typography
               sx={{ 
                 marginTop: "16px", 
@@ -119,7 +139,7 @@ const Signup = () => {
             >
               Password
             </Typography>
-            <CustomizedInput type="password" name="password" />
+            <CustomizedInput type="password" name="password" label="Password" />
 
             <Button
               type="submit"
@@ -127,7 +147,7 @@ const Signup = () => {
                 px: 2,
                 py: 1,
                 mt: 2,
-                width: "100%", // Full width for better responsiveness
+                width: "100%",
                 borderRadius: 2,
                 bgcolor: "#00fffc",
                 ":hover": {
