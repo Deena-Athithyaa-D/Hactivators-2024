@@ -1,11 +1,23 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Box, Typography, Button, IconButton } from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Menu from "@mui/icons-material/Menu"; // Single icon import
+
 import ChatItem from "../components/chat/ChatItem";
 import { IoMdSend } from "react-icons/io";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { BASEURL } from "./constants";
+
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  type: "text" | "video";
+};
 
 const theme = createTheme({
   palette: {
@@ -25,30 +37,26 @@ const theme = createTheme({
 });
 
 const Chat = () => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
   const [prompt, setPrompt] = useState<string>("");
 
-  // Save chats to localStorage
   const saveChatsToLocalStorage = (messages: Message[]) => {
     localStorage.setItem("chatMessages", JSON.stringify(messages));
   };
 
-  // Retrieve chats from localStorage
-  const loadChatsFromLocalStorage = () => {
+  const loadChatsFromLocalStorage = (): Message[] => {
     const storedMessages = localStorage.getItem("chatMessages");
-    if (storedMessages) {
-      return JSON.parse(storedMessages);
-    }
-    return [];
+    return storedMessages ? JSON.parse(storedMessages) : [];
   };
 
   const handleSubmit = async () => {
-    const content = inputRef.current?.value as string;
-    if (inputRef && inputRef.current) {
-      inputRef.current.value = "";
-    }
+    if (!prompt.trim()) return;
+
+    const content = prompt;
+    setPrompt("");
+    
     const newMessage: Message = { role: "user", content, type: "text" };
     setChatMessages((prev) => {
       const updatedMessages = [...prev, newMessage];
@@ -60,7 +68,7 @@ const Chat = () => {
       const resp = await axios.post(
         `${BASEURL}v2/render`,
         {
-          code: prompt,
+          code: content,
           filename: "frontend.mp4",
         },
         {
@@ -71,7 +79,7 @@ const Chat = () => {
       );
 
       if (resp.data.video_url) {
-        const videoMessage = {
+        const videoMessage: Message = {
           role: "assistant",
           content: resp.data.video_url,
           type: "video",
@@ -83,7 +91,8 @@ const Chat = () => {
         });
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      toast.error("Failed to generate video");
     }
   };
 
@@ -101,16 +110,14 @@ const Chat = () => {
     const storedMessages = loadChatsFromLocalStorage();
     if (storedMessages.length) {
       setChatMessages(storedMessages);
-      toast.success("Loaded chats from local storage");
     } else {
-      const initialMessages: Message[] = [
+      setChatMessages([
         {
           role: "assistant",
           content: "Hello! How can I assist you?",
           type: "text",
         },
-      ];
-      setChatMessages(initialMessages);
+      ]);
     }
   }, []);
 
@@ -120,8 +127,8 @@ const Chat = () => {
     }
   }, [chatMessages]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSubmit();
     }
@@ -220,8 +227,9 @@ const Chat = () => {
                   key={index}
                   content={chat.content}
                   role={chat.role}
+                  type={chat.type}
                   sx={{
-                    alignSelf: chat.role === "user" ? "flex-end" : "flex-start", // User on right, assistant on left
+                    alignSelf: chat.role === "user" ? "flex-end" : "flex-start",
                   }}
                 />
               ))}
@@ -230,6 +238,7 @@ const Chat = () => {
             <Box sx={{ display: "flex", gap: 1, mt: 2, width: "100%" }}>
               <textarea
                 ref={inputRef}
+                value={prompt}
                 placeholder="Type a message"
                 onKeyDown={handleKeyDown}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -240,6 +249,8 @@ const Chat = () => {
                   border: "1px solid #7C3AED",
                   backgroundColor: "#2C2C3D",
                   color: "#FFF",
+                  minHeight: "50px",
+                  resize: "vertical",
                 }}
               />
               <IconButton

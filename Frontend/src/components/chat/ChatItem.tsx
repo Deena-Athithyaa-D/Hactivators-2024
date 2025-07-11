@@ -23,16 +23,20 @@ function isCodeBlock(str: string) {
   );
 }
 
+interface ChatItemProps {
+  content: string;
+  role: "user" | "assistant";
+  type: "text" | "video";
+  sx?: object;
+}
+
 const ChatItem = ({
   content,
   role,
-  sx, // Accept sx prop for additional styles
-}: {
-  content: string;
-  role: "user" | "assistant";
-  sx?: object; // Add sx prop
-}) => {
-  const messageBlocks = extractCodeFromString(content);
+  type,
+  sx,
+}: ChatItemProps) => {
+  const messageBlocks = type === "text" ? extractCodeFromString(content) : null;
 
   // Conditional background for messages
   const backgroundColor = role === "assistant" ? "#7C3AED" : "#9B59B6";
@@ -45,7 +49,7 @@ const ChatItem = ({
         gap: 2,
         borderRadius: 2,
         my: 1,
-        ...sx, // Apply additional styles
+        ...sx,
       }}
     >
       {/* Avatar based on role */}
@@ -57,22 +61,37 @@ const ChatItem = ({
         )}
       </Avatar>
       <Box>
-        {/* Content rendering */}
-        {!messageBlocks && (
+        {/* Render video if type is video */}
+        {type === "video" && (
+          <video
+            src={content}
+            controls
+            style={{
+              maxWidth: "100%",
+              borderRadius: "8px",
+              backgroundColor: "#000",
+            }}
+          />
+        )}
+
+        {/* Render text content */}
+        {type === "text" && !messageBlocks && (
           <Typography
             sx={{
               fontSize: "20px",
               backgroundColor: backgroundColor,
               padding: "8px 16px",
               borderRadius: 2,
-              maxWidth: "fit-content", // Ensure it wraps around the text
+              maxWidth: "fit-content",
             }}
           >
             {content}
           </Typography>
         )}
+
         {/* If message has code blocks */}
-        {messageBlocks &&
+        {type === "text" &&
+          messageBlocks &&
           messageBlocks.length &&
           messageBlocks.map((block, index) =>
             isCodeBlock(block) ? (

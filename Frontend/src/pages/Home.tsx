@@ -1,4 +1,7 @@
-import { Box, useMediaQuery, createTheme, ThemeProvider } from "@mui/material";
+import Box from "@mui/material/Box";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
 import React from "react";
 import TypingAnim from "../components/typer/TypingAnim";
 import Footer from "../components/footer/Footer";
@@ -25,7 +28,7 @@ const Home = () => {
 
   return (
     <ThemeProvider theme={customTheme}>
-      <Header sx={{ zIndex: 1000, position: 'relative' }} /> {/* Ensure the header has a high z-index */}
+      <Header /> {/* Removed sx prop since Header doesn't accept it */}
       <Box
         width={"100%"}
         height={"100%"}
@@ -40,8 +43,8 @@ const Home = () => {
             alignItems: "center",
             mx: "auto",
             mt: 3,
-            position: "relative", // Ensure proper layout
-            zIndex: 1, // Keep content below the 3D model
+            position: "relative",
+            zIndex: 1,
           }}
         >
           <Box>
@@ -55,7 +58,7 @@ const Home = () => {
               gap: 5,
               my: 10,
               position: "relative",
-              zIndex: 1, // Ensure it's below the 3D model
+              zIndex: 1,
             }}
           >
             <img
@@ -75,7 +78,7 @@ const Home = () => {
                 margin: "auto",
                 width: isBelowMd ? "80%" : "60%",
                 borderRadius: 20,
-                boxShadow: "-5px -5px 105px #7C3AED", // Violet shadow
+                boxShadow: "-5px -5px 105px #7C3AED",
                 marginTop: 20,
                 marginBottom: 20,
                 padding: 10,
@@ -84,30 +87,7 @@ const Home = () => {
           </Box>
         </Box>
 
-        {/* 3D Model with fixed position */}
-        <Box
-          sx={{
-            position: "fixed", // Make the model fixed
-            top: "50%", // Start at the middle of the viewport
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: isBelowMd ? "90vw" : "70vw", // Increase width
-            height: isBelowMd ? "90vh" : "70vh", // Increase height
-            zIndex: 9999, // High z-index to ensure it stays above all other content
-            pointerEvents: "auto", // Allow interaction with the 3D model
-          }}
-        >
-          <iframe
-            src="https://my.spline.design/robotfollowcursorforlandingpage-bc83f993bb81d65f96b13560a2f2c7f4/"
-            frameBorder="0"
-            allowFullScreen
-            style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: "10px", // Optional: add border-radius for smoother corners
-            }}
-          ></iframe>
-        </Box>
+
 
         <Footer />
       </Box>
