@@ -1,11 +1,12 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-
+import { useNavigate } from "react-router-dom"; // Added for navigation
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import Menu from "@mui/icons-material/Menu"; // Single icon import
+import Menu from "@mui/icons-material/Menu";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"; // Added back icon
 
 import ChatItem from "../components/chat/ChatItem";
 import { IoMdSend } from "react-icons/io";
@@ -37,6 +38,7 @@ const theme = createTheme({
 });
 
 const Chat = () => {
+  const navigate = useNavigate(); // Added for navigation
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [chatMessages, setChatMessages] = useState<Message[]>([]);
@@ -106,6 +108,10 @@ const Chat = () => {
     }
   };
 
+  const handleBackToHome = () => {
+    navigate("/"); // Navigate to home page
+  };
+
   useLayoutEffect(() => {
     const storedMessages = loadChatsFromLocalStorage();
     if (storedMessages.length) {
@@ -145,8 +151,27 @@ const Chat = () => {
           mt: 3,
           gap: 3,
           bgcolor: "background.default",
+          position: "relative", // Added for positioning the back button
         }}
       >
+        {/* Back Button - Added at top left */}
+        <IconButton
+          onClick={handleBackToHome}
+          sx={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            color: "text.primary",
+            zIndex: 10,
+            backgroundColor: "primary.main",
+            "&:hover": {
+              backgroundColor: "#5B27A0",
+            },
+          }}
+        >
+          <ArrowBackIcon />
+        </IconButton>
+
         <Typography
           sx={{
             fontSize: "40px",
@@ -235,7 +260,7 @@ const Chat = () => {
               ))}
             </Box>
 
-            <Box sx={{ display: "flex", gap: 1, mt: 2, width: "100%" }}>
+            <Box sx={{ display: "flex", gap: 2, mt: 2, width: "100%", alignItems: "center" }}>
               <textarea
                 ref={inputRef}
                 value={prompt}
@@ -244,20 +269,29 @@ const Chat = () => {
                 onChange={(e) => setPrompt(e.target.value)}
                 style={{
                   flex: 1,
-                  padding: "10px",
-                  borderRadius: "5px",
+                  padding: "15px",
+                  borderRadius: "25px", // More rounded corners
                   border: "1px solid #7C3AED",
                   backgroundColor: "#2C2C3D",
                   color: "#FFF",
                   minHeight: "50px",
                   resize: "vertical",
+                  fontSize: "16px",
+                  outline: "none",
                 }}
               />
               <IconButton
                 onClick={handleSubmit}
-                sx={{ bgcolor: "#7C3AED", ":hover": { bgcolor: "#5B27A0" } }}
+                sx={{ 
+                  bgcolor: "#7C3AED", 
+                  ":hover": { bgcolor: "#5B27A0" },
+                  width: "56px", 
+                  height: "56px",
+                  borderRadius: "50%", // Makes it perfectly round
+                  marginLeft: "8px",
+                }}
               >
-                <IoMdSend color="#FFF" />
+                <IoMdSend color="#FFF" size={24} />
               </IconButton>
             </Box>
           </Box>

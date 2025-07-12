@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { IoIosLogIn } from "react-icons/io";
+import { FaUserAlt } from "react-icons/fa"; // Import guest icon
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -8,7 +9,7 @@ import Button from "@mui/material/Button";
 import CustomizedInput from "../components/shared/CustomizedInput";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header.tsx";
-import axios from 'axios'; // Make sure to install axios
+import axios from 'axios';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -22,16 +23,13 @@ const Signup = () => {
     const password = formData.get("password") as string;
     
     try {
-      // Replace with your actual API endpoint
       const response = await axios.post('http://your-api-endpoint/signup', {
         name,
         email,
         password
       });
 
-      // Handle successful signup
       if (response.data.success) {
-        // Store user data in localStorage or session
         localStorage.setItem('user', JSON.stringify(response.data.user));
         localStorage.setItem('token', response.data.token);
         navigate("/chat");
@@ -42,6 +40,12 @@ const Signup = () => {
       console.error("Signup error:", error);
       setError("An error occurred during signup");
     }
+  };
+
+  const handleGuestLogin = () => {
+    // Set guest flag in localStorage if needed
+    localStorage.setItem('isGuest', 'true');
+    navigate("/chat");
   };
 
   return (
@@ -158,6 +162,37 @@ const Signup = () => {
               endIcon={<IoIosLogIn />}
             >
               Signup
+            </Button>
+
+            {/* Divider */}
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              my: 2,
+              color: 'text.secondary'
+            }}>
+              <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+              <Typography variant="body2" sx={{ px: 2 }}>OR</Typography>
+              <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
+            </Box>
+
+            {/* Guest Login Button */}
+            <Button
+              onClick={handleGuestLogin}
+              sx={{
+                px: 2,
+                py: 1,
+                width: "100%",
+                borderRadius: 2,
+                bgcolor: "#7C3AED", // Violet color to match your theme
+                color: "white",
+                ":hover": {
+                  bgcolor: "#5B27A0", // Darker violet on hover
+                },
+              }}
+              endIcon={<FaUserAlt />}
+            >
+              Continue as Guest
             </Button>
           </Box>
         </Box>
