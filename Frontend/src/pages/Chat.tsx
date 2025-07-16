@@ -30,7 +30,14 @@ const Chat = () => {
   const chatContainerRef = useRef<HTMLDivElement | null>(null); // Ref for the chat container
   const [chatMessages, setChatMessages] = useState<[]>([]);
   const [prompt, setPrompt] = useState<string>("");
-
+  function generateRandomString() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 5; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 
   const handleSubmit = async () => {
     const content = inputRef.current?.value as string;
@@ -40,6 +47,7 @@ const Chat = () => {
     const newMessage: Message = { role: "user", content, type: "text" };
     setChatMessages((prev) => [...prev, newMessage]);
     console.log("yoyo came inside handle submit")
+    let rfile = generateRandomString()+".mp4";
     try{
       console.log("yoyoyoyoy try")
       const formattedCode = content
@@ -47,8 +55,8 @@ const Chat = () => {
             .replace(/"/g, '\\"')   // Escape double quotes
             .replace(/\n/g, '\\n'); // Escape newline characters
       const resp = await axios.post(`${BASEURL}v2/render`, {
-        code: prompt,
-        filename: "frontend.mp4"
+        prompt: prompt,
+        filename: rfile
       }, {
         headers: {
           'Content-Type': 'application/json'
