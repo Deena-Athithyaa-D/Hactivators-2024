@@ -65,13 +65,26 @@ const Chat = () => {
       saveChatsToLocalStorage(updatedMessages);
       return updatedMessages;
     });
+    // Generate a random alphanumeric string of length 5
+    const generateRandomString = (length: number) => {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    };
+
+    // Get first word and combine with random string
+    const firstWord = content.split(' ')[0];
+    const filename = `${firstWord}_${generateRandomString(5)}`;
 
     try {
       const resp = await axios.post(
         `${BASEURL}v2/render`,
         {
-          code: content,
-          filename: "frontend.mp4",
+          prompt: content,
+          filename: filename,
         },
         {
           headers: {

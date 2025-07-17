@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # Import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 from dotenv import load_dotenv
 import subprocess
@@ -99,6 +101,14 @@ app = Flask(__name__)
 # Initialize CORS with support for credentials
 CORS(app, supports_credentials=True)  # Allow credentials in CORS
 
+# Initialize rate limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["100 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
 # Load environment variables from .env file
 load_dotenv()
 if(os.getenv('OPENAI_API_KEY') == None):
@@ -139,6 +149,7 @@ def extract_code(text):
     return "No code found."
 
 @app.route('/v2/render', methods=['POST'])
+@limiter.limit("5 per minute")  # Add rate limiting to this specific endpoint
 def render_manimv1json():
     try:
         # Get the prompt from the request
@@ -193,6 +204,7 @@ def render_manimv1json():
 
         # Clean up temporary files
         os.remove(temp_file_path)
+        os.remove(output_path)
         shutil.rmtree(temp_dir)  # Use shutil.rmtree to remove the directory and its contents
 
         # Return the video URL
@@ -202,6 +214,14 @@ def render_manimv1json():
         return jsonify({"error": "AWS credentials not found."}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# Add error handler for rate limit exceeded
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return jsonify({
+        "error": "Rate limit exceeded",
+        "message": str(e.description)
+    }), 429
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
