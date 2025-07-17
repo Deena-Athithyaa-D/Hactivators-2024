@@ -3,3 +3,4 @@ node_modules/
 backend/media/
 dist/
 __pycache__/
+.env
