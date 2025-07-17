@@ -107,10 +107,10 @@ if(os.getenv('OPENAI_API_KEY') == None):
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-BUCKET_NAME = os.getenv('BUCKET_NAME')
+BUCKET_NAME = os.getenv('AWS_BUCKET_NAME')
 # print("OPENAI_API_KEY: ", OPENAI_API_KEY)
 # print("AWS_ACCESS_KEY_ID: ", AWS_ACCESS_KEY_ID)
-print("AWS_SECRET_ACCESS_KEY: ", AWS_SECRET_ACCESS_KEY)
+# print("AWS_SECRET_ACCESS_KEY: ", AWS_SECRET_ACCESS_KEY)
 print("BUCKET_NAME: ", BUCKET_NAME)
 # Initialize S3 client with credentials from .env
 s3_client = boto3.client(
@@ -118,7 +118,6 @@ s3_client = boto3.client(
     aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
     aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
 )
-BUCKET_NAME = 'myawsstestings3'  # Replace with your S3 bucket name
 
 # Set OpenAI API key from .env
 client = openai.OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -146,7 +145,7 @@ def render_manimv1json():
         data = request.get_json()
         prompt = data.get('prompt')
         filename = data.get('filename')
-
+        print("Request Received with prompt: ", prompt)
         # Generate the Manim code using ChatGPT based on the prompt
         prompt_for_chatgpt = "create a " + prompt+ " for 10 seconds using manim library in python. Make sure to import all packages. I dont want any error in code. DONT USE PACKAGES like math and time. Use the following code as a sample " + SAMPLE
         output = chat_gpt(prompt_for_chatgpt)
@@ -171,13 +170,13 @@ def render_manimv1json():
             temp_file.write(manim_code)
 
         # Set the hardcoded output path
-        output_path = "/home/azureuser/Hactivators-2024/backend/media/videos/scene/1080p60/PythagorasTheorem.mp4"
+        output_path = "/home/azureuser/Hactivators-2024/backend/media/videos/scene/1080p60/"+filename+".mp4"
 
         # Call Manim using subprocess to render the video
         command = [
             "manim",
             temp_file_path,
-            "PythagorasTheorem",
+            filename,
             "-o",
             output_path
         ]
@@ -186,7 +185,7 @@ def render_manimv1json():
         subprocess.run(command, check=True)
 
         # Upload the video file to S3
-        s3_key = f"videos/{filename}"  # Set the path in S3 bucket
+        s3_key = f"videos/{filename}.mp4"  # Set the path in S3 bucket
         s3_client.upload_file(output_path, BUCKET_NAME, s3_key)
 
         # Generate the URL for the uploaded video
