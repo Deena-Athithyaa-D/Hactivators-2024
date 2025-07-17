@@ -70,7 +70,7 @@ const Chat = () => {
       const resp = await axios.post(
         `${BASEURL}v2/render`,
         {
-          code: content,
+          prompt: content,
           filename: "frontend.mp4",
         },
         {
